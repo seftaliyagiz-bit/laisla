@@ -46,19 +46,23 @@
     .lang-toggle a { color: rgba(253,248,240,.38); text-decoration: none; cursor: pointer; font-weight: 500; transition: color .2s; }
     .lang-toggle a.active, .lang-toggle a:hover { color: var(--gold); }
     .lang-sep { color: rgba(253,248,240,.2); }
-    .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
-    .nav-hamburger span { display: block; width: 24px; height: 2px; background: var(--turq); border-radius: 2px; transition: all .3s; }
+    .hamburger { display: none; background: none; border: none; color: var(--turq); font-size: 1.4rem; cursor: pointer; padding: 4px 6px; line-height: 1; }
 
     /* ── MOBILE MENU ── */
     .mobile-menu {
-      display: none; position: fixed; top: 64px; left: 0; right: 0;
+      display: flex; flex-direction: column;
+      position: fixed; top: 64px; left: 0; right: 0;
       background: var(--card); border-bottom: 2px solid var(--turq);
-      z-index: 999; padding: 1.5rem 2rem; flex-direction: column; gap: .8rem;
+      z-index: 999;
+      max-height: 0; overflow: hidden;
+      transition: max-height .35s ease, padding .2s ease;
+      padding: 0 2rem;
     }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a { color: rgba(253,248,240,.85); text-decoration: none; font-size: 1rem; padding: .4rem 0; border-bottom: 1px solid rgba(10,147,150,.12); }
-    .mobile-menu a:last-child { border-bottom: none; }
-    .mobile-cta { color: var(--red) !important; font-weight: 500; }
+    .mobile-menu.open { max-height: 480px; padding: 1.2rem 2rem 1.5rem; }
+    .mobile-menu > a { color: rgba(253,248,240,.85); text-decoration: none; font-size: 1rem; padding: .55rem 0; border-bottom: 1px solid rgba(10,147,150,.1); display: block; }
+    .mobile-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .8rem; padding-top: .9rem; margin-top: .3rem; border-top: 1px solid rgba(10,147,150,.15); }
+    .mobile-bottom .lang-toggle a { color: rgba(253,248,240,.42); }
+    .mobile-cta { background: var(--red); color: #fff !important; padding: .45rem 1.1rem; border-radius: 6px; font-weight: 500; font-size: .9rem; text-decoration: none; }
 
     /* ── HERO ── */
     .hero {
@@ -232,8 +236,8 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
-      .nav-links     { display: none; }
-      .nav-hamburger { display: flex; }
+      .nav-links { display: none; }
+      .hamburger { display: block; }
       .feature-grid  { grid-template-columns: 1fr; }
       .menu-wrapper  { grid-template-columns: 1fr; }
       .menu-cat.full { grid-column: auto; }
@@ -276,9 +280,9 @@
       <span class="lang-sep">/</span>
       <a id="btn-en" onclick="setLang('en')">EN</a>
     </div>
-    <div class="nav-hamburger" id="hamburger" role="button" tabindex="0" aria-label="Apri menu">
-      <span></span><span></span><span></span>
-    </div>
+    <button class="hamburger" id="hamburger" aria-label="Apri menu">
+      <i class="fas fa-bars"></i>
+    </button>
   </div>
 </nav>
 
@@ -288,7 +292,16 @@
   <a href="#about"   onclick="closeMobile()"><span class="lang-it">Chi siamo</span><span class="lang-en" style="display:none">About</span></a>
   <a href="#gallery" onclick="closeMobile()"><span class="lang-it">Galleria</span><span class="lang-en" style="display:none">Gallery</span></a>
   <a href="#contact" onclick="closeMobile()"><span class="lang-it">Contatti</span><span class="lang-en" style="display:none">Contact</span></a>
-  <a href="#contact" class="mobile-cta" onclick="closeMobile()"><span class="lang-it">Prenota un tavolo</span><span class="lang-en" style="display:none">Reserve a table</span></a>
+  <div class="mobile-bottom">
+    <div class="lang-toggle">
+      <a onclick="setLang('it')">IT</a>
+      <span class="lang-sep">/</span>
+      <a onclick="setLang('en')">EN</a>
+    </div>
+    <a href="#contact" class="mobile-cta" onclick="closeMobile()">
+      <span class="lang-it">Prenota un tavolo</span><span class="lang-en" style="display:none">Reserve a table</span>
+    </a>
+  </div>
 </div>
 
 <!-- ── HERO ── -->
@@ -746,8 +759,19 @@
   /* ── HAMBURGER ── */
   const hamburger  = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobile-menu');
-  hamburger.addEventListener('click', () => mobileMenu.classList.toggle('open'));
-  function closeMobile() { mobileMenu.classList.remove('open'); }
+
+  hamburger.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    hamburger.querySelector('i').className = isOpen ? 'fas fa-xmark' : 'fas fa-bars';
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+
+  function closeMobile() {
+    mobileMenu.classList.remove('open');
+    hamburger.querySelector('i').className = 'fas fa-bars';
+    document.body.style.overflow = '';
+  }
+
   document.addEventListener('click', e => {
     if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) closeMobile();
   });
